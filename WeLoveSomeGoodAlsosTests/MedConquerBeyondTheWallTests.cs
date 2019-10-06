@@ -7,13 +7,25 @@ namespace WeLoveSomeGoodAlsosTests
 {
     public class MedConquerBeyondTheWallTests
     {
-        [Test, TestCaseSource("SolutionPossibleTestCases"), TestCaseSource("SolutionImpossibleTestCases")]
-        public void RunSolutionTests(List<MedConquerBeyondTheWall.Island> islands, List<int> name, int dreamInfluence, int solution)
+        [Test, TestCaseSource("SolutionPossibleTestCases")]
+        public void RunPossibleSolution(List<MedConquerBeyondTheWall.Island> islands, List<int> name, int dreamInfluence, int solution)
         {
             // Arrange
 
             // Act
-            var calculatedSolution = MedConquerBeyondTheWall.RunProblemSolution(islands, name, dreamInfluence);
+            var calculatedSolution = MedConquerBeyondTheWall.RunSolutionForWorld(islands, name, dreamInfluence);
+
+            // Asssert
+            Assert.AreEqual(solution, calculatedSolution);
+        }
+
+        [Test, TestCaseSource("SolutionImpossibleTestCases")]
+        public void RunImpossibleSolutionTests(List<MedConquerBeyondTheWall.Island> islands, List<int> name, int dreamInfluence, int solution)
+        {
+            // Arrange
+
+            // Act
+            var calculatedSolution = MedConquerBeyondTheWall.RunSolutionForWorld(islands, name, dreamInfluence);
 
             // Asssert
             Assert.AreEqual(solution, calculatedSolution);

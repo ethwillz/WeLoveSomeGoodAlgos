@@ -24,7 +24,7 @@ namespace WeLoveSomeGoodAlgos
         /// <param name="dreamInfluence">Dream influence level of special nations for dictator</param>
         /// <returns>Minimum number of nations to conquer on Y-axis path to spell dictator's name or int max if it's not possible</returns>
         /// </summary>
-        public static int RunProblemSolution(List<Island> islands, List<int> name, double dreamInfluence)
+        public static int RunSolutionForWorld(List<Island> islands, List<int> name, double dreamInfluence)
         {
             var allSpecialNationIslands = GetAllSpecialNationIslands(dreamInfluence, islands);
 
