@@ -3,10 +3,10 @@ using System.Linq;
 
 namespace WeLoveSomeGoodAlgos
 {
-    public class HardBearAndAlmostRow
+    public static class HardBearAndAlmostRow
     {
         // TODO make more descriptive and write docs with runtime (based off of Dkikstra)
-        public int RunSolution(int numCities, Dictionary<int, int> extraRoads)
+        public static int RunSolution(int numCities, Dictionary<int, int> extraRoads)
         {
             int minDistSum = 0;
 
@@ -23,7 +23,7 @@ namespace WeLoveSomeGoodAlgos
             return minDistSum;
         }
 
-        public Dictionary<int, List<int>> GenerateFullRoadList(int numCities, Dictionary<int, int> extraRoads)
+        public static Dictionary<int, List<int>> GenerateFullRoadList(int numCities, Dictionary<int, int> extraRoads)
         {
             Dictionary<int, List<int>> allRoads = new Dictionary<int, List<int>>();
 
@@ -44,7 +44,7 @@ namespace WeLoveSomeGoodAlgos
             return allRoads;
         }
 
-        public void CreateOrAppendDest(ref Dictionary<int, List<int>> allRoads, int src, int dest)
+        public static void CreateOrAppendDest(ref Dictionary<int, List<int>> allRoads, int src, int dest)
         {
             if (allRoads.ContainsKey(src))
             {
@@ -60,7 +60,7 @@ namespace WeLoveSomeGoodAlgos
             }
         }
 
-        public int GetMinDistCities(int src, int dest, Dictionary<int, List<int>> allRoads)
+        public static int GetMinDistCities(int src, int dest, Dictionary<int, List<int>> allRoads)
         {
             Dictionary<int, int> cityDistMap = new Dictionary<int, int>();
 
@@ -74,63 +74,44 @@ namespace WeLoveSomeGoodAlgos
             return CalculateShortestPath(cityDistMap, allRoads, dest);
         }
 
-        private int CalculateShortestPath(Dictionary<int, int> cityDistMap, Dictionary<int, List<int>> allRoads, int dest)
+        private static int CalculateShortestPath(Dictionary<int, int> cityDistMap, Dictionary<int, List<int>> allRoads, int dest)
         {
             var shortestPath = int.MaxValue;
 
-            while (cityDistMap.Count > 0)
+            while (cityDistMap.Count > 0 && cityDistMap.Values.Any(dist => shortestPath > dist))
             {
-                var curCity = cityDistMap.Keys.ElementAt(0);
-                var nextDist = cityDistMap.ElementAt(curCity).Value + 1;
+                var curCity = cityDistMap.First().Key;
+                cityDistMap.TryGetValue(curCity, out int nextDist);
+                nextDist++;
 
                 allRoads.TryGetValue(curCity, out List<int> nextCities);
 
                 nextCities.ForEach(next =>
                 {
-                    if (!HandleIfNextCityDest(next, nextDist, dest, curCity, ref cityDistMap, ref shortestPath)
-                        && !HandleIfDuplicatePath(next, curCity, nextDist, ref cityDistMap))
+                    cityDistMap.Remove(curCity);
+
+                    if (next == dest && nextDist < shortestPath)
+                    {
+                        shortestPath = nextDist;
+                    }
+                    else if (cityDistMap.ContainsKey(next))
+                    {
+                        cityDistMap.TryGetValue(next, out int altDistToCity);
+
+                        if (nextDist < altDistToCity)
+                        {
+                            cityDistMap.Remove(next);
+                            cityDistMap.Add(next, nextDist);
+                        }
+                    }
+                    else
                     {
                         cityDistMap.Add(next, nextDist);
-                        cityDistMap.Remove(curCity);
                     }
                 });
             }
 
             return shortestPath;
-        }
-
-        private bool HandleIfNextCityDest(int next, int nextDist, int dest, int curCity, ref Dictionary<int, int> cityDistMap, ref int shortestPath)
-        {
-            if (next == dest)
-            {
-                if (nextDist < shortestPath)
-                {
-                    shortestPath = nextDist;
-                }
-
-                cityDistMap.Remove(curCity);
-
-                return true;
-            }
-
-            return false;
-        }
-
-        public bool HandleIfDuplicatePath(int next, int nextDist, int curCity, ref Dictionary<int, int> cityDistMap)
-        {
-            if (cityDistMap.ContainsKey(next))
-            {
-                cityDistMap.TryGetValue(next, out int altDistToCity);
-
-                if (nextDist < altDistToCity) {
-                    cityDistMap.Remove(curCity);
-                    cityDistMap.Add(next, nextDist);
-                }
-
-                return true;
-            }
-
-            return false;
         }
     }
 }
