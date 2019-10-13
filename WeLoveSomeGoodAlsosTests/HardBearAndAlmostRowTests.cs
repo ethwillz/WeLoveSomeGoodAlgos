@@ -19,7 +19,8 @@ namespace WeLoveSomeGoodAlsosTests
             Assert.AreEqual(expectedTotalDistance, totalDistance);
         }
 
-        static object[] SolutionTestCases = {
+        static object[] SolutionTestCases =
+        {
             new object[]
             {
                 4,
