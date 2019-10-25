@@ -5,7 +5,32 @@ namespace WeLoveSomeGoodAlgos
 {
     public static class HardBearAndAlmostRow
     {
-        // TODO make more descriptive and write docs with runtime (based off of Dkikstra)
+        /// <summary>
+        /// https://www.codechef.com/problems/ALMROW
+        ///
+        /// this problem has a list of cities and assumes that each city has a road
+        /// to the next one. Additionally, there may be any number of extra roads
+        /// between cities. This calculates the total distance made up of the min
+        /// distance between every city.
+        ///
+        /// Approach:
+        /// I used Djikstra's to perform each individual city calculation and just
+        /// cycled through all the cities performing that operation. I believe the
+        /// big O runtime of this solution is O(V^2*E) because each city combination
+        /// must be checked and the runtime of Djikstra's is O(ElogV) so we can drop
+        /// the log since V^2 exceeds this. Not sure on this.
+        ///
+        /// Alternative approach:
+        /// This seems like a good candidate for a different kind of solution. I
+        /// was thinking maybe a DP problem because I traversed many of the roads
+        /// multiple times and it seems optimal to cache these. Update: tried to
+        /// look at other solutions to see about this and they're completely
+        /// unreadble. Best solution literally names functions func1-14 so I don't
+        /// think I'll get much insight on this.
+        /// </summary>
+        /// <param name="numCities"></param>
+        /// <param name="extraRoads"></param>
+        /// <returns></returns>
         public static long RunSolution(int numCities, Dictionary<int, int> extraRoads)
         {
             long minDistSum = 0;
@@ -16,7 +41,7 @@ namespace WeLoveSomeGoodAlgos
             {
                 for(int cityToIndex = cityFromIndex + 1; cityToIndex < numCities; cityToIndex++)
                 {
-                    minDistSum += GetMinDistCities(cityFromIndex, cityToIndex, allRoads);
+                    minDistSum += GetMinDistBtCities(cityFromIndex, cityToIndex, allRoads);
                 }
             }
 
@@ -60,45 +85,45 @@ namespace WeLoveSomeGoodAlgos
             }
         }
 
-        public static int GetMinDistCities(int src, int dest, Dictionary<int, List<int>> allRoads)
+        public static int GetMinDistBtCities(int src, int dest, Dictionary<int, List<int>> allRoads)
         {
-            Dictionary<int, int> cityDistMap = new Dictionary<int, int>();
+            Dictionary<int, int> citiesWithSrcDist = new Dictionary<int, int>();
 
-            cityDistMap.Add(src, 0);
+            citiesWithSrcDist.Add(src, 0);
 
             var shortestPath = int.MaxValue;
 
-            while (cityDistMap.Count > 0 && cityDistMap.Values.Any(dist => shortestPath > dist))
+            while (citiesWithSrcDist.Count > 0 && citiesWithSrcDist.Values.Any(dist => shortestPath > dist))
             {
-                var curCity = cityDistMap.OrderBy(map => map.Value).First().Key;
-                cityDistMap.TryGetValue(curCity, out int nextDist);
+                var curCity = citiesWithSrcDist.OrderBy(map => map.Value).First().Key;
+                citiesWithSrcDist.TryGetValue(curCity, out int nextDist);
                 nextDist++;
 
                 allRoads.TryGetValue(curCity, out List<int> nextCities);
 
-                nextCities.ForEach(next =>
+                nextCities.ForEach(nextCity =>
                 {
-                    if (next == dest && nextDist < shortestPath)
+                    if (nextCity == dest && nextDist < shortestPath)
                     {
                         shortestPath = nextDist;
                     }
-                    else if (cityDistMap.ContainsKey(next))
+                    else if (citiesWithSrcDist.ContainsKey(nextCity))
                     {
-                        cityDistMap.TryGetValue(next, out int altDistToCity);
+                        citiesWithSrcDist.TryGetValue(nextCity, out int altDistToCity);
 
                         if (nextDist < altDistToCity)
                         {
-                            cityDistMap.Remove(next);
-                            cityDistMap.Add(next, nextDist);
+                            citiesWithSrcDist.Remove(nextCity);
+                            citiesWithSrcDist.Add(nextCity, nextDist);
                         }
                     }
                     else
                     {
-                        cityDistMap.Add(next, nextDist);
+                        citiesWithSrcDist.Add(nextCity, nextDist);
                     }
                 });
 
-                cityDistMap.Remove(curCity);
+                citiesWithSrcDist.Remove(curCity);
             }
 
             return shortestPath;
