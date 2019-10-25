@@ -1,14 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using NUnit.Framework;
+﻿using System.Collections.Generic;
 using WeLoveSomeGoodAlgos;
+using Xunit;
 
 namespace WeLoveSomeGoodAlsosTests
 {
     public class MedConquerBeyondTheWallTests
     {
-        [Test, TestCaseSource("SolutionPossibleTestCases")]
-        public void RunPossibleSolution(List<MedConquerBeyondTheWall.Island> islands, List<int> name, int dreamInfluence, int solution)
+        [Theory, MemberData(nameof(SolutionPossibleTestCases))]
+        public void RunPossibleSolution_Default_Succeeds(List<MedConquerBeyondTheWall.Island> islands, List<int> name, int dreamInfluence, int solution)
         {
             // Arrange
 
@@ -16,11 +15,11 @@ namespace WeLoveSomeGoodAlsosTests
             var calculatedSolution = MedConquerBeyondTheWall.RunSolutionForWorld(islands, name, dreamInfluence);
 
             // Asssert
-            Assert.AreEqual(solution, calculatedSolution);
+            Assert.Equal(solution, calculatedSolution);
         }
 
-        [Test, TestCaseSource("SolutionImpossibleTestCases")]
-        public void RunImpossibleSolutionTests(List<MedConquerBeyondTheWall.Island> islands, List<int> name, int dreamInfluence, int solution)
+        [Theory, MemberData(nameof(SolutionImpossibleTestCases))]
+        public void RunImpossibleSolutionTests_Default_Succeeds(List<MedConquerBeyondTheWall.Island> islands, List<int> name, int dreamInfluence, int solution)
         {
             // Arrange
 
@@ -28,10 +27,11 @@ namespace WeLoveSomeGoodAlsosTests
             var calculatedSolution = MedConquerBeyondTheWall.RunSolutionForWorld(islands, name, dreamInfluence);
 
             // Asssert
-            Assert.AreEqual(solution, calculatedSolution);
+            Assert.Equal(solution, calculatedSolution);
         }
 
-        static object[] SolutionPossibleTestCases = {
+        public static IEnumerable<object[]> SolutionPossibleTestCases = new List<object[]>
+        {
             new object[]
             {
                 new List<MedConquerBeyondTheWall.Island>(new[] {
@@ -111,7 +111,7 @@ namespace WeLoveSomeGoodAlsosTests
             }
         };
 
-        static object[] SolutionImpossibleTestCases =
+        public static IEnumerable<object[]> SolutionImpossibleTestCases = new List<object[]>
         {
             new object[]
             {

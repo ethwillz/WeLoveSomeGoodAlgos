@@ -6,13 +6,13 @@ namespace WeLoveSomeGoodAlgos
     public static class HardBearAndAlmostRow
     {
         // TODO make more descriptive and write docs with runtime (based off of Dkikstra)
-        public static int RunSolution(int numCities, Dictionary<int, int> extraRoads)
+        public static long RunSolution(int numCities, Dictionary<int, int> extraRoads)
         {
-            int minDistSum = 0;
+            long minDistSum = 0;
 
             var allRoads = GenerateFullRoadList(numCities, extraRoads);
 
-            for(int cityFromIndex = 0; cityFromIndex < numCities - 2; cityFromIndex++)
+            for(int cityFromIndex = 0; cityFromIndex < numCities - 1; cityFromIndex++)
             {
                 for(int cityToIndex = cityFromIndex + 1; cityToIndex < numCities; cityToIndex++)
                 {
@@ -64,23 +64,13 @@ namespace WeLoveSomeGoodAlgos
         {
             Dictionary<int, int> cityDistMap = new Dictionary<int, int>();
 
-            allRoads.TryGetValue(src, out List<int> nextCities);
+            cityDistMap.Add(src, 0);
 
-            nextCities.ForEach(next =>
-            {
-                cityDistMap.Add(next, 1);
-            });
-
-            return CalculateShortestPath(cityDistMap, allRoads, dest);
-        }
-
-        private static int CalculateShortestPath(Dictionary<int, int> cityDistMap, Dictionary<int, List<int>> allRoads, int dest)
-        {
             var shortestPath = int.MaxValue;
 
             while (cityDistMap.Count > 0 && cityDistMap.Values.Any(dist => shortestPath > dist))
             {
-                var curCity = cityDistMap.First().Key;
+                var curCity = cityDistMap.OrderBy(map => map.Value).First().Key;
                 cityDistMap.TryGetValue(curCity, out int nextDist);
                 nextDist++;
 
@@ -88,8 +78,6 @@ namespace WeLoveSomeGoodAlgos
 
                 nextCities.ForEach(next =>
                 {
-                    cityDistMap.Remove(curCity);
-
                     if (next == dest && nextDist < shortestPath)
                     {
                         shortestPath = nextDist;
@@ -109,6 +97,8 @@ namespace WeLoveSomeGoodAlgos
                         cityDistMap.Add(next, nextDist);
                     }
                 });
+
+                cityDistMap.Remove(curCity);
             }
 
             return shortestPath;

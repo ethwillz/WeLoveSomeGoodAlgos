@@ -1,14 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using NUnit.Framework;
+﻿using System.Collections.Generic;
 using WeLoveSomeGoodAlgos;
+using Xunit;
 
 namespace WeLoveSomeGoodAlsosTests
 {
     public class HardBearAndAlmostRowTests
     {
-        [Test, TestCaseSource("SolutionTestCases")]
-        public static void RunSolutionTests(int numCities, Dictionary<int, int> extraRoads, int expectedTotalDistance)
+        [Theory]
+        [MemberData(nameof(SolutionTestCases))]
+        public static void RunSolutionTests_Default_Succeeds(int numCities, Dictionary<int, int> extraRoads, long expectedTotalDistance)
         {
             // Arrange
 
@@ -16,10 +16,10 @@ namespace WeLoveSomeGoodAlsosTests
             var totalDistance = HardBearAndAlmostRow.RunSolution(numCities, extraRoads);
 
             // Assert
-            Assert.AreEqual(expectedTotalDistance, totalDistance);
+            Assert.Equal(expectedTotalDistance, totalDistance);
         }
 
-        static object[] SolutionTestCases =
+        public static IEnumerable<object[]> SolutionTestCases = new List<object[]>
         {
             new object[]
             {
@@ -47,12 +47,6 @@ namespace WeLoveSomeGoodAlsosTests
                     { 16, 18 }
                 },
                 891
-            },
-            new object[]
-            {
-                1000000,
-                new Dictionary<int, int>(),
-                166666666666500000
             }
         };
     }

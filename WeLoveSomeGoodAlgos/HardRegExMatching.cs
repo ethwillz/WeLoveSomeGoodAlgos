@@ -18,22 +18,21 @@ namespace WeLoveSomeGoodAlgos
 
             var state = new bool[word.Length + 1, patt.Length + 1];
 
-            var hasAnyWildCardStart = patt.Length >= 2 && patt[0] == '.' && patt[1] == '*';
-
-            FillEmptyCase(ref state, hasAnyWildCardStart);
+            FillEmptyCase(ref state, patt);
 
             return CalculateStateAndSolution(ref state, word, patt);
         }
 
         /// <summary>
-        /// Will set empty word/pattern case with true and false for everything else
+        /// Will set empty word/pattern case with true and false for  everything else
         /// unless the pattern begins with .* in which case empty will satisfy the
         /// regex pattern, any other pattern characters will fail on empty word though
         /// </summary>
         /// <param name="state">The state structure used to solve the problem</param>
-        /// <param name="hasAnyWildCardStart">If the first two pattern characters are .*</param>
-        public static void FillEmptyCase(ref bool[,] state, bool hasAnyWildCardStart)
+        /// <param name="emptyStringWildCardMatchEnd">If the first two pattern characters are .*</param>
+        public static void FillEmptyCase(ref bool[,] state, string patt)
         {
+            bool wildCardStreakActive = true;
             for(int wordIdx = 0; wordIdx < state.GetLength(WORD_DIM); wordIdx++)
             {
                 for(int pattIdx = 0; pattIdx < state.GetLength(PATT_DIM); pattIdx++)
@@ -42,13 +41,21 @@ namespace WeLoveSomeGoodAlgos
                     {
                         state[wordIdx, pattIdx] = true;
                     }
-                    else if(hasAnyWildCardStart && wordIdx == 0 && pattIdx < 3)
+                    else if (wordIdx == 0
+                        && pattIdx > 0
+                        && wildCardStreakActive
+                        && (patt[pattIdx - 1] == '*' || patt[pattIdx - 1] == '.'))
                     {
                         state[wordIdx, pattIdx] = true;
                     }
                     else
                     {
                         state[wordIdx, pattIdx] = false;
+
+                        if(wordIdx == 0 && pattIdx < patt.Length - 2)
+                        {
+                            wildCardStreakActive = patt[pattIdx] == '*';
+                        }
                     }
                 }
             }
@@ -73,13 +80,17 @@ namespace WeLoveSomeGoodAlgos
             {
                 for (int pattIdx = 1; pattIdx < state.GetLength(PATT_DIM); pattIdx++)
                 {
-                    if (word[wordIdx - 1] == patt[pattIdx - 1]) //TODO think of naming convention for this to be more clear
+                    if (word[wordIdx - 1] == patt[pattIdx - 1] || patt[pattIdx - 1] == '.')
                     {
                         state[wordIdx, pattIdx] = state[wordIdx - 1, pattIdx - 1];
                     }
                     else if(patt[pattIdx - 1] == '*')
                     {
-                        CalculateWildCardSituation(ref state, wordIdx, pattIdx);
+                        bool zeroOkay = state[wordIdx, pattIdx - 1];
+                        bool extendsPrevMatch = state[wordIdx - 1, pattIdx]
+                            && (patt[pattIdx - 2] == '.' || patt[pattIdx - 2] == word[wordIdx - 1]);
+
+                        state[wordIdx, pattIdx] = zeroOkay || extendsPrevMatch;
                     }
                     else
                     {
@@ -89,22 +100,6 @@ namespace WeLoveSomeGoodAlgos
             }
 
             return state[word.Length, patt.Length];
-        }
-
-        public static void CalculateWildCardSituation(ref bool[,] state, int wordIdx, int pattIdx)
-        {
-            if(state[wordIdx - 2, pattIdx]) 
-            {
-                state[wordIdx, pattIdx] = true;
-            }
-            else if(state[wordIdx - 1, pattIdx])
-            {
-                state[wordIdx, pattIdx] = state[wordIdx - 1, pattIdx - 1];
-            }
-            else
-            {
-                state[wordIdx, pattIdx] = false;
-            }
         }
     }
 }

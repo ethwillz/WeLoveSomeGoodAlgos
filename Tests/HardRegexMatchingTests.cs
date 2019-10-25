@@ -1,13 +1,15 @@
 ﻿using System;
-using NUnit.Framework;
+using System.Collections.Generic;
 using WeLoveSomeGoodAlgos;
+using Xunit;
 
 namespace WeLoveSomeGoodAlsosTests
 {
     public class HardRegexMatchingTests
     {
-        [Test, TestCaseSource("SolutionTestCases")]
-        public static void RunSolutionTestCases(String word, String pattern, bool isMatchExpected)
+        [Theory]
+        [MemberData(nameof(SolutionTestCases))]
+        public static void RunSolutionTestCases_Default_Succeeds(String word, String pattern, bool isMatchExpected)
         {
             //Arrange
 
@@ -15,10 +17,10 @@ namespace WeLoveSomeGoodAlsosTests
             var regexMatches = HardRegExMatching.RunSolution(word, pattern);
 
             //Assert
-            Assert.AreEqual(isMatchExpected, regexMatches);
+            Assert.Equal(isMatchExpected, regexMatches);
         }
 
-        static object[] SolutionTestCases =
+        public static IEnumerable<object[]> SolutionTestCases = new List<object[]>
         {
             new object[]
             {
